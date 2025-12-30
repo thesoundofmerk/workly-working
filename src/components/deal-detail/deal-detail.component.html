@@ -1,0 +1,154 @@
+<div class="min-h-screen bg-gray-900 text-gray-200">
+  <header class="bg-gray-800 shadow-md">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        @if(deal(); as d) {
+          <h1 class="text-2xl font-bold text-white">
+            Deal: {{ d.title }}
+          </h1>
+        }
+        @if(contact(); as c) {
+            <a [routerLink]="['/crm/contacts', c.id]" class="px-4 py-2 text-sm font-medium bg-gray-700 hover:bg-gray-600 text-white rounded-md transition-colors">
+              Back to Contact
+            </a>
+        }
+      </div>
+    </div>
+  </header>
+  <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+    @if(deal(); as d) {
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Left Column: Deal Info -->
+        <div class="lg:col-span-1 space-y-6">
+          <div class="bg-gray-800 rounded-lg shadow p-6">
+            <div class="flex justify-between items-center border-b border-gray-700 pb-2 mb-4">
+              <h2 class="text-xl font-semibold">Deal Details</h2>
+              <a [routerLink]="['/crm/deals', d.id, 'invoice']" class="px-3 py-1 text-xs font-semibold bg-brand/80 hover:bg-brand text-white rounded-md flex items-center space-x-1.5 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <span>Invoice</span>
+              </a>
+            </div>
+            <div class="space-y-3 text-sm">
+                <div class="flex justify-between items-center">
+                  <strong class="font-medium text-gray-400">Status:</strong>
+                  <span class="px-2 py-1 text-xs font-semibold rounded-full"
+                        [class.bg-yellow-500/20]="d.status === 'Open'"
+                        [class.text-yellow-300]="d.status === 'Open'"
+                        [class.bg-green-500/20]="d.status === 'Won'"
+                        [class.text-green-300]="d.status === 'Won'"
+                        [class.bg-red-500/20]="d.status === 'Lost'"
+                        [class.text-red-300]="d.status === 'Lost'">
+                        {{ d.status }}
+                  </span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <strong class="font-medium text-gray-400">Quote:</strong>
+                  <span class="font-bold text-lg text-white">{{ d.quotedPrice | currency }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <strong class="font-medium text-gray-400">Final Price:</strong>
+                  <span>{{ d.finalPrice ? (d.finalPrice | currency) : 'N/A' }}</span>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-4 pt-4">
+              <h3 class="text-md font-semibold text-gray-300 mb-3">Quote Breakdown</h3>
+              <div class="space-y-2 text-sm">
+                  @if (d.drivewayPrice) {
+                      <div class="flex justify-between items-center hover:bg-gray-700/50 -mx-2 px-2 py-1 rounded-md">
+                          <p class="text-gray-300">Driveway Sealing <span class="text-xs text-gray-400">({{ d.drivewaySqft }} sq ft)</span></p>
+                          <p class="font-mono text-white">{{ d.drivewayPrice | currency }}</p>
+                      </div>
+                  }
+                  @if (d.crackPrice) {
+                      <div class="flex justify-between items-center hover:bg-gray-700/50 -mx-2 px-2 py-1 rounded-md">
+                          <p class="text-gray-300">Crack Repair <span class="text-xs text-gray-400">({{ d.crackFeet }} ft)</span></p>
+                          <p class="font-mono text-white">{{ d.crackPrice | currency }}</p>
+                      </div>
+                  }
+                  @if (d.asphaltPrice) {
+                      <div class="flex justify-between items-center hover:bg-gray-700/50 -mx-2 px-2 py-1 rounded-md">
+                          <p class="text-gray-300">Asphalt Patch <span class="text-xs text-gray-400">({{ d.asphaltSqft }} sq ft)</span></p>
+                          <p class="font-mono text-white">{{ d.asphaltPrice | currency }}</p>
+                      </div>
+                  }
+                  @if (!d.drivewayPrice && !d.crackPrice && !d.asphaltPrice) {
+                      <p class="text-center text-gray-500 text-xs py-2">No breakdown available for this deal.</p>
+                  }
+              </div>
+            </div>
+
+          </div>
+          <div class="bg-gray-800 rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold border-b border-gray-700 pb-2 mb-4">Associated Contact</h2>
+            @if(contact(); as c) {
+              <div class="space-y-1 text-sm">
+                <p class="font-bold text-lg text-brand-light">{{ c.firstName }} {{ c.lastName }}</p>
+                <p>{{ c.email }}</p>
+                <p>{{ c.phone }}</p>
+              </div>
+            } @else {
+              <p class="text-gray-400">Loading contact...</p>
+            }
+          </div>
+          @if(d.notes) {
+            <div class="bg-gray-800 rounded-lg shadow p-6">
+              <h2 class="text-xl font-semibold border-b border-gray-700 pb-2 mb-4">Visit Notes</h2>
+              <p class="text-sm text-gray-300 whitespace-pre-wrap">{{ d.notes }}</p>
+            </div>
+          }
+           <div class="bg-gray-800 rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold border-b border-gray-700 pb-2 mb-4">Key Dates</h2>
+            <div class="space-y-3 text-sm">
+              <div class="flex justify-between items-center">
+                <strong class="font-medium text-gray-400">Quote Date:</strong>
+                <span>{{ d.quoteDate | date:'mediumDate' }}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <strong class="font-medium text-gray-400">Created:</strong>
+                <span>{{ d.createdAt | date:'medium' }}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <strong class="font-medium text-gray-400">Last Update:</strong>
+                <span>{{ d.updatedAt | date:'medium' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Activity -->
+        <div class="lg:col-span-2">
+          <div class="bg-gray-800 rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold border-b border-gray-700 pb-2 mb-4">Deal Activity</h2>
+            @if(activities().length > 0) {
+              <ul class="space-y-8">
+                @for(activity of activities(); track activity.id) {
+                  <li class="relative pl-8">
+                    <div class="absolute top-1 left-0 h-full w-px bg-gray-700"></div>
+                    <span class="absolute left-[-8px] top-1.5 h-4 w-4 rounded-full bg-brand flex items-center justify-center ring-4 ring-gray-800">
+                       <svg class="h-5 w-5 text-gray-900" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getActivityIcon(activity.activityType)"></path>
+                       </svg>
+                    </span>
+                    <div class="ml-4">
+                        <p class="text-sm font-semibold text-white">{{ activity.title }}</p>
+                        <p class="text-xs text-gray-400">{{ activity.timestamp | date:'medium' }}</p>
+                        <p class="text-sm mt-1 text-gray-300">{{ activity.description }}</p>
+                    </div>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="text-center text-gray-500 py-8">No activity specific to this deal.</p>
+            }
+          </div>
+        </div>
+      </div>
+    } @else {
+      <p class="text-center text-gray-500 py-12">Deal not found.</p>
+    }
+  </main>
+</div>

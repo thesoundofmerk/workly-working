@@ -1,0 +1,6 @@
+<div #mapContainer class="w-full h-full bg-gray-700"></div>
+@if (!mapInitialized()) {
+  <div class="absolute inset-0 z-10">
+    <app-map-placeholder></app-map-placeholder>
+  </div>
+}

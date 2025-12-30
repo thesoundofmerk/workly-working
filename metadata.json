@@ -1,0 +1,7 @@
+{
+  "name": "Workly",
+  "description": "A field-sales and estimating tool for door-to-door home-services. It helps contractors manage visits, generate quotes, and track field work sessions, with offline capabilities.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}

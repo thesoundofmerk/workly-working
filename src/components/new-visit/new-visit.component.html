@@ -1,0 +1,182 @@
+<!-- 
+  This template defines the form content once, so it can be reused for both 
+  the desktop sidebar and the mobile pop-up modal, avoiding code duplication.
+-->
+<ng-template #visitFormContent>
+  <form [formGroup]="visitForm" (ngSubmit)="saveVisit()" class="space-y-8">
+    <!-- Customer Info -->
+    <div class="bg-gray-800 p-6 rounded-lg shadow">
+      <h2 class="text-xl font-semibold border-b border-gray-700 pb-2 mb-4">Customer Information</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <input formControlName="firstName" type="text" placeholder="First Name" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:ring-brand focus:border-brand">
+        <input formControlName="lastName" type="text" placeholder="Last Name" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:ring-brand focus:border-brand">
+        <input formControlName="email" type="email" placeholder="Email" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:ring-brand focus:border-brand">
+        <input formControlName="phone" type="tel" placeholder="Phone" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:ring-brand focus:border-brand">
+      </div>
+    </div>
+
+    <!-- Address Info -->
+    <div class="bg-gray-800 p-6 rounded-lg shadow">
+      <div class="flex justify-between items-center border-b border-gray-700 pb-2 mb-4">
+        <h2 class="text-xl font-semibold">Address</h2>
+        <button type="button" (click)="useCurrentLocation()" class="px-3 py-1 text-xs font-semibold bg-brand/80 hover:bg-brand text-white rounded-md">
+          Use Current Location
+        </button>
+      </div>
+      <div class="space-y-4">
+        <input formControlName="street" type="text" placeholder="Street Address" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:ring-brand focus:border-brand">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <input formControlName="city" type="text" placeholder="City" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:ring-brand focus:border-brand">
+          <input formControlName="state" type="text" placeholder="State" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:ring-brand focus:border-brand">
+          <input formControlName="zip" type="text" placeholder="ZIP Code" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:ring-brand focus:border-brand">
+        </div>
+         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+          <input formControlName="latitude" type="number" placeholder="Latitude" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:ring-brand focus:border-brand">
+          <input formControlName="longitude" type="number" placeholder="Longitude" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:ring-brand focus:border-brand">
+        </div>
+      </div>
+    </div>
+
+    <!-- Job & Pricing Details -->
+    <div class="bg-gray-800 p-6 rounded-lg shadow">
+      <h2 class="text-xl font-semibold border-b border-gray-700 pb-2 mb-4">Job & Pricing Details</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <div>
+          <label for="sqft" class="block text-sm font-medium text-gray-400">Driveway Sq. Ft.</label>
+          <input id="sqft" formControlName="sqft" type="number" placeholder="e.g., 2000" class="mt-1 w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:ring-brand focus:border-brand">
+        </div>
+        <div>
+          <label for="crackFeet" class="block text-sm font-medium text-gray-400">Crack Ft.</label>
+          <input id="crackFeet" formControlName="crackFeet" type="number" placeholder="e.g., 150" class="mt-1 w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:ring-brand focus:border-brand">
+        </div>
+        <div>
+          <label for="asphaltRepair" class="block text-sm font-medium text-gray-400">Asphalt Repair Sq. Ft.</label>
+          <input id="asphaltRepair" formControlName="asphaltRepair" type="number" placeholder="e.g., 50" class="mt-1 w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:ring-brand focus:border-brand">
+        </div>
+      </div>
+      @if(pricingDetails(); as details) {
+        <div class="bg-gray-900/50 p-4 rounded-md grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div>
+                <p class="text-sm text-gray-400">Driveway</p>
+                <p class="text-lg font-semibold text-brand-light">{{ details.drivewayQuoted | currency }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-400">Crack Repair</p>
+                <p class="text-lg font-semibold text-brand-light">{{ details.crackQuoted | currency }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-400">Asphalt</p>
+                <p class="text-lg font-semibold text-brand-light">{{ details.asphalt | currency }}</p>
+            </div>
+            <div class="col-span-2 md:col-span-1 bg-brand/20 p-2 rounded">
+                <p class="text-sm font-bold text-white">Total Quote</p>
+                <p class="text-2xl font-bold text-white">{{ details.totalQuoted | currency }}</p>
+            </div>
+            <div class="col-span-2 md:col-span-4 text-right text-xs text-gray-500 pt-2">
+              <span>Undiscounted: {{ details.totalUndisc | currency }}</span> | 
+              <span>Discount: {{ details.totalDiscount | currency }}</span>
+            </div>
+        </div>
+      }
+    </div>
+
+    <!-- Sales & Notes -->
+    <div class="bg-gray-800 p-6 rounded-lg shadow">
+      <h2 class="text-xl font-semibold border-b border-gray-700 pb-2 mb-4">Sales & Notes</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label for="salesStatus" class="block text-sm font-medium text-gray-400">Sales Status</label>
+          <select id="salesStatus" formControlName="salesStatus" class="mt-1 w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:ring-brand focus:border-brand">
+            @for(status of statuses; track status){
+              <option [value]="status">{{ status }}</option>
+            }
+          </select>
+        </div>
+        <div class="sm:col-span-2">
+          <label for="notes" class="block text-sm font-medium text-gray-400">Notes</label>
+          <textarea id="notes" formControlName="notes" rows="4" class="mt-1 w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:ring-brand focus:border-brand"></textarea>
+        </div>
+      </div>
+    </div>
+    
+    <div class="flex justify-end">
+      <button type="submit" [disabled]="visitForm.invalid" class="px-6 py-3 bg-brand hover:bg-brand-dark text-white font-bold rounded-lg shadow-lg transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed">
+        Save Visit & Quote
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+@if (isCanvassingQuote()) {
+  <!-- Simple form-centric layout for quotes from canvassing -->
+  <div class="min-h-screen bg-gray-900 text-gray-200">
+    <header class="bg-gray-800 shadow-md">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <h1 class="text-2xl font-bold text-white">
+            Create Quote
+          </h1>
+          <button (click)="cancel()" class="px-4 py-2 text-sm font-medium bg-gray-700 hover:bg-gray-600 text-white rounded-md transition-colors">
+            Back to Canvassing
+          </button>
+        </div>
+      </div>
+    </header>
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+      <div class="max-w-4xl mx-auto">
+        <ng-container [ngTemplateOutlet]="visitFormContent"></ng-container>
+      </div>
+    </main>
+  </div>
+} @else {
+  <!-- Original D2D layout -->
+  <div class="flex flex-col-reverse md:flex-row h-screen bg-gray-900 text-gray-200 overflow-hidden">
+    
+    <!-- Sidebar: Map and Session Stats (Shows as main view on mobile) -->
+    <aside class="w-full h-full md:w-1/2 lg:w-1/3 bg-gray-800 md:border-l border-gray-700 flex flex-col">
+      <app-map 
+        [markers]="sessionVisits()" 
+        [polyline]="activeSessionPolyline()"
+        [currentPosition]="currentPosition()"
+        class="flex-grow min-h-[300px] md:min-h-0">
+      </app-map>
+      <app-session-sidebar [session]="displaySession()" (endSession)="endSession()"></app-session-sidebar>
+    </aside>
+
+    <!-- Main Content: Form for Desktop -->
+    <main class="hidden md:block w-full md:w-1/2 lg:w-2/3 p-4 sm:p-6 overflow-y-auto">
+      <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-white mb-6">New Visit / Quote</h1>
+        <ng-container [ngTemplateOutlet]="visitFormContent"></ng-container>
+      </div>
+    </main>
+    
+    <!-- Mobile: Form Modal -->
+    @if (isFormModalVisible()) {
+      <div class="md:hidden fixed inset-0 bg-gray-900 z-50 animate-slide-in-up">
+        <div class="w-full h-full overflow-y-auto p-4 sm:p-6">
+          <div class="max-w-4xl mx-auto">
+            <div class="flex justify-between items-center mb-6">
+              <h1 class="text-3xl font-bold text-white">New Visit / Quote</h1>
+              <button (click)="closeFormModal()" type="button" class="p-2 rounded-full bg-gray-700 hover:bg-gray-600">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+            </div>
+            <ng-container [ngTemplateOutlet]="visitFormContent"></ng-container>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Mobile: FAB to open form -->
+    @if (!isFormModalVisible()) {
+      <button (click)="openFormModal()" 
+              class="md:hidden fixed bottom-6 right-6 z-40 bg-brand hover:bg-brand-dark text-white font-bold rounded-full px-5 py-3 shadow-lg flex items-center justify-center animate-fade-in">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        <span class="ml-2 font-semibold">New Quote</span>
+      </button>
+    }
+  </div>
+}

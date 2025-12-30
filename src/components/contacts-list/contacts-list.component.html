@@ -1,0 +1,97 @@
+<div class="min-h-screen bg-gray-900 text-gray-200">
+  <header class="bg-gray-800 shadow-md">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <h1 class="text-2xl font-bold text-white">CRM Contacts</h1>
+        <a routerLink="/dashboard" class="px-4 py-2 text-sm font-medium bg-gray-700 hover:bg-gray-600 text-white rounded-md transition-colors">
+          Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </header>
+  <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="bg-gray-800 rounded-lg shadow overflow-hidden">
+        
+        <!-- Mobile Card View -->
+        <div class="md:hidden">
+          @if (contacts().length > 0) {
+            <ul class="divide-y divide-gray-700">
+              @for (contact of contacts(); track contact.id) {
+                <li (click)="viewContact(contact.id)" class="p-4 hover:bg-gray-700/50 transition-colors cursor-pointer space-y-2">
+                  <div class="flex justify-between items-start">
+                    <h3 class="font-bold text-white">{{ contact.firstName }} {{ contact.lastName }}</h3>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-brand-dark/50 text-brand-light whitespace-nowrap">
+                      {{ contact.leadStatus }}
+                    </span>
+                  </div>
+                  <div class="text-sm text-gray-400 space-y-1">
+                     <p>{{ contact.email }}</p>
+                     <p>{{ contact.street }}, {{ contact.city }}</p>
+                  </div>
+                </li>
+              }
+            </ul>
+          } @else {
+            <div class="px-6 py-12 text-center text-gray-500">
+              No contacts found. Start a session and save a visit to create one.
+            </div>
+          }
+        </div>
+
+        <!-- Desktop Table View -->
+        <div class="hidden md:block overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-700">
+            <thead class="bg-gray-700/50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Name</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Contact Info</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Address</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Lead Status</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Created</th>
+                <th scope="col" class="relative px-6 py-3">
+                  <span class="sr-only">View</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-700">
+              @if (contacts().length > 0) {
+                @for (contact of contacts(); track contact.id) {
+                  <tr class="hover:bg-gray-700/50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm font-medium text-white">{{ contact.firstName }} {{ contact.lastName }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-300">{{ contact.email }}</div>
+                      <div class="text-sm text-gray-400">{{ contact.phone }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                      {{ contact.street }}, {{ contact.city }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-brand-dark/50 text-brand-light">
+                        {{ contact.leadStatus }}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                      {{ contact.createdAt | date:'short' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <button (click)="viewContact(contact.id)" class="text-brand-light hover:text-brand">View</button>
+                    </td>
+                  </tr>
+                }
+              } @else {
+                <tr>
+                  <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                    No contacts found. Start a session and save a visit to create one.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
