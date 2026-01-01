@@ -1,25 +1,34 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
-  templateUrl: './login.component.html',
+  standalone: true,
   imports: [CommonModule, FormsModule],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: './login.component.html'
 })
 export class LoginComponent {
-  private authService = inject(AuthService);
-  username = signal('');
-  password = signal('');
-  error = signal<string | null>(null);
+  username: string = '';
+  password: string = '';
+  error: string | null = null;
 
-  login() {
-    this.error.set(null);
-    const success = this.authService.login(this.username(), this.password());
-    if (!success) {
-      this.error.set('Invalid username or password.');
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  login(): void {
+    const ok = this.authService.login(this.username.trim(), this.password);
+
+    if (!ok) {
+      this.error = 'Username and password are required.';
+      return;
     }
+
+    this.error = null;
+    this.router.navigateByUrl('/');
   }
 }

@@ -1,64 +1,64 @@
 import { Injectable, signal } from '@angular/core';
 
-export interface User {
+export interface AuthUser {
   name: string;
+  email?: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly STORAGE_KEY = 'worklyUser';
-  private _currentUser = signal<User | null>(null);
+  private readonly STORAGE_KEY = 'worklyCurrentUser';
 
-  constructor() {
+  // Internal user signal
+  #user = signal<AuthUser | null>(this.loadInitialUser());
+
+  constructor() {}
+
+  private loadInitialUser(): AuthUser | null {
     try {
-      const stored = localStorage.getItem(this.STORAGE_KEY);
-      if (stored) {
-        this._currentUser.set(JSON.parse(stored));
-      }
+      const raw = localStorage.getItem(this.STORAGE_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw) as AuthUser;
     } catch {
-      // ignore storage errors
+      localStorage.removeItem(this.STORAGE_KEY);
+      return null;
     }
   }
 
-  // Used all over your app (e.g. new-visit)
-  currentUser(): User | null {
-    return this._currentUser();
+  /** Returns the current user (or null if not logged in) */
+  currentUser(): AuthUser | null {
+    return this.#user();
   }
 
-  // Used by auth.guard.ts
+  /** Simple boolean check for auth guard / template use */
   isAuthenticated(): boolean {
-    return !!this._currentUser();
+    return !!this.#user();
   }
 
-  // Used by login.component.ts with 2 args and checked as boolean
+  /**
+   * Fake login: accepts any non-empty username+password.
+   * Returns true on success, false otherwise.
+   */
   login(username: string, password: string): boolean {
-    const trimmed = (username || '').trim();
-
-    // Simple fake auth: require a non-empty username
-    if (!trimmed) {
+    if (!username || !password) {
       return false;
     }
 
-    const user: User = { name: trimmed };
-    this._currentUser.set(user);
+    const user: AuthUser = {
+      name: username,
+      email: `${username}@example.com`
+    };
 
-    try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(user));
-    } catch {
-      // ignore storage errors
-    }
-
+    this.#user.set(user);
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(user));
     return true;
   }
 
+  /** Log out and clear storage */
   logout(): void {
-    this._currentUser.set(null);
-    try {
-      localStorage.removeItem(this.STORAGE_KEY);
-    } catch {
-      // ignore storage errors
-    }
+    this.#user.set(null);
+    localStorage.removeItem(this.STORAGE_KEY);
   }
 }
