@@ -1,10 +1,16 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component } from '@angular/core';
+import { NgIf } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
+
+import { AuthService } from './services/auth.service';
+import { LoginComponent } from './components/login/login.component';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet]
+  standalone: true,
+  imports: [NgIf, RouterOutlet, LoginComponent],
+  templateUrl: './app.component.html'
 })
-export class AppComponent {}
+export class AppComponent {
+  constructor(public auth: AuthService) {}
+}

@@ -1,62 +1,64 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { User } from '../models/user.model';
+import { Injectable, signal } from '@angular/core';
 
-interface MockUser extends User {
-  password_plaintext: string;
+export interface User {
+  name: string;
 }
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class AuthService {
-  private router = inject(Router);
-  
-  // Mock user database
-  private MOCK_USERS: MockUser[] = [
-    { id: 1, name: 'John Doe', username: 'johndoe', role: 'Salesperson', password_plaintext: 'password' },
-    { id: 2, name: 'Jane Smith', username: 'janesmith', role: 'Admin', password_plaintext: 'password' }
-  ];
-  
-  #currentUser = signal<User | null>(null);
+  private readonly STORAGE_KEY = 'worklyUser';
+  private _currentUser = signal<User | null>(null);
 
   constructor() {
-    const userJson = localStorage.getItem('currentUser');
-    if (userJson) {
-      this.#currentUser.set(JSON.parse(userJson));
+    try {
+      const stored = localStorage.getItem(this.STORAGE_KEY);
+      if (stored) {
+        this._currentUser.set(JSON.parse(stored));
+      }
+    } catch {
+      // ignore storage errors
     }
   }
 
-  currentUser = computed(() => this.#currentUser());
-  isAuthenticated = computed(() => !!this.#currentUser());
-
-  login(username: string, password: string):boolean {
-    // In a real app, this would be an API call.
-    // Plaintext password check as per spec.
-    const user = this.MOCK_USERS.find(u => u.username === username && u.password_plaintext === password);
-    if (user) {
-      const token = `mock-token-for-${user.username}`;
-      localStorage.setItem('authToken', token);
-      
-      const userToStore: User = {
-        id: user.id,
-        name: user.name,
-        username: user.username,
-        role: user.role
-      };
-
-      localStorage.setItem('currentUser', JSON.stringify(userToStore));
-      this.#currentUser.set(userToStore);
-      this.router.navigate(['/']);
-      return true;
-    }
-    return false;
+  // Used all over your app (e.g. new-visit)
+  currentUser(): User | null {
+    return this._currentUser();
   }
 
-  logout() {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('currentUser');
-    this.#currentUser.set(null);
-    this.router.navigate(['/login']);
+  // Used by auth.guard.ts
+  isAuthenticated(): boolean {
+    return !!this._currentUser();
+  }
+
+  // Used by login.component.ts with 2 args and checked as boolean
+  login(username: string, password: string): boolean {
+    const trimmed = (username || '').trim();
+
+    // Simple fake auth: require a non-empty username
+    if (!trimmed) {
+      return false;
+    }
+
+    const user: User = { name: trimmed };
+    this._currentUser.set(user);
+
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(user));
+    } catch {
+      // ignore storage errors
+    }
+
+    return true;
+  }
+
+  logout(): void {
+    this._currentUser.set(null);
+    try {
+      localStorage.removeItem(this.STORAGE_KEY);
+    } catch {
+      // ignore storage errors
+    }
   }
 }

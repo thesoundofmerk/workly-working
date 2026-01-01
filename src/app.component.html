@@ -1,3 +1,7 @@
-<main class="min-h-screen">
+<!-- Show login if not authenticated -->
+<app-login *ngIf="!auth.currentUser(); else appShell"></app-login>
+
+<!-- Normal app content when logged in -->
+<ng-template #appShell>
   <router-outlet></router-outlet>
-</main>
+</ng-template>
