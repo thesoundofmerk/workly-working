@@ -10,7 +10,12 @@ export class VisitService {
   constructor() {
     const storedVisits = localStorage.getItem('worklyVisits');
     if (storedVisits) {
-      this.#visits.set(JSON.parse(storedVisits));
+      try {
+        this.#visits.set(JSON.parse(storedVisits));
+      } catch (error) {
+        console.warn('Unable to parse worklyVisits from localStorage.', error);
+        localStorage.removeItem('worklyVisits');
+      }
     }
 
     effect(() => {

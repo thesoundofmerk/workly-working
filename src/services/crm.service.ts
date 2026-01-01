@@ -21,13 +21,34 @@ export class CrmService {
 
   private loadFromLocalStorage() {
     const contacts = localStorage.getItem('worklyContacts');
-    if (contacts) this.#contacts.set(JSON.parse(contacts));
+    if (contacts) {
+      try {
+        this.#contacts.set(JSON.parse(contacts));
+      } catch (error) {
+        console.warn('Unable to parse worklyContacts from localStorage.', error);
+        localStorage.removeItem('worklyContacts');
+      }
+    }
 
     const deals = localStorage.getItem('worklyDeals');
-    if (deals) this.#deals.set(JSON.parse(deals));
+    if (deals) {
+      try {
+        this.#deals.set(JSON.parse(deals));
+      } catch (error) {
+        console.warn('Unable to parse worklyDeals from localStorage.', error);
+        localStorage.removeItem('worklyDeals');
+      }
+    }
     
     const activities = localStorage.getItem('worklyActivities');
-    if (activities) this.#activities.set(JSON.parse(activities));
+    if (activities) {
+      try {
+        this.#activities.set(JSON.parse(activities));
+      } catch (error) {
+        console.warn('Unable to parse worklyActivities from localStorage.', error);
+        localStorage.removeItem('worklyActivities');
+      }
+    }
   }
   
   // Contacts
@@ -193,13 +214,13 @@ export class CrmService {
     this.#deals.update(deals => [...deals, newDeal]);
 
     this.addActivity({
-        contactId: contactId,
-        dealId: newDeal.id,
-        activityType: 'deal_created',
-        title: 'Deal Created from Visit',
-        description: `An opportunity was identified and a deal was created with a quote of $${newDeal.quotedPrice}.`,
-        timestamp: now,
-        metadata: { visitId: visit.id, autoCreated: true }
+      contactId: contactId,
+      dealId: newDeal.id,
+      activityType: 'deal_created',
+      title: 'Deal Created from Visit',
+      description: `An opportunity was identified and a deal was created with a quote of $${newDeal.quotedPrice}.`,
+      timestamp: now,
+      metadata: { visitId: visit.id, autoCreated: true }
     });
 
     return newDeal.id;
