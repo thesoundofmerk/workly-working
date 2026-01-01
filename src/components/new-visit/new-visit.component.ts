@@ -272,10 +272,16 @@ export class NewVisitComponent implements OnInit, OnDestroy {
       this.geocoder = new google.maps.Geocoder();
     } else {
       await new Promise<void>(resolve => {
+        let attempts = 0;
         const interval = setInterval(() => {
+          attempts++;
           if (typeof google !== 'undefined' && typeof google.maps !== 'undefined') {
             clearInterval(interval);
             this.geocoder = new google.maps.Geocoder();
+            resolve();
+          } else if (attempts > 50) {
+            clearInterval(interval);
+            console.error('Google Maps API did not load in time.');
             resolve();
           }
         }, 100);
@@ -314,6 +320,10 @@ export class NewVisitComponent implements OnInit, OnDestroy {
     });
 
     await this.initializeGeocoder();
+    if (!this.geocoder) {
+      alert('Google Maps API is not available. Unable to look up address.');
+      return;
+    }
     
     this.geocoder.geocode({ location: pos }, (results: any[], status: string) => {
       this.zone.run(() => {

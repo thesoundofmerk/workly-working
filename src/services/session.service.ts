@@ -31,11 +31,21 @@ export class SessionService {
   constructor() {
     const storedVisitSessions = localStorage.getItem('worklyVisitSessions');
     if (storedVisitSessions) {
-      this.#visitSessions.set(JSON.parse(storedVisitSessions));
+      try {
+        this.#visitSessions.set(JSON.parse(storedVisitSessions));
+      } catch (error) {
+        console.warn('Unable to parse worklyVisitSessions from localStorage.', error);
+        localStorage.removeItem('worklyVisitSessions');
+      }
     }
     const storedCanvassingSessions = localStorage.getItem('worklyCanvassingSessions');
     if (storedCanvassingSessions) {
-      this.#canvassingSessions.set(JSON.parse(storedCanvassingSessions));
+      try {
+        this.#canvassingSessions.set(JSON.parse(storedCanvassingSessions));
+      } catch (error) {
+        console.warn('Unable to parse worklyCanvassingSessions from localStorage.', error);
+        localStorage.removeItem('worklyCanvassingSessions');
+      }
     }
 
     effect(() => {
@@ -83,8 +93,8 @@ export class SessionService {
   
   startCanvassingSession(salesperson: string): CanvassingSession {
     const existingActiveSession = this.activeSession();
-    if (existingActiveSession) {
-      return existingActiveSession as CanvassingSession;
+    if (existingActiveSession && 'doorHangersPlaced' in existingActiveSession) {
+      return existingActiveSession;
     }
 
     const now = new Date().toISOString();
