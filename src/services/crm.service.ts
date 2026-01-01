@@ -21,13 +21,34 @@ export class CrmService {
 
   private loadFromLocalStorage() {
     const contacts = localStorage.getItem('worklyContacts');
-    if (contacts) this.#contacts.set(JSON.parse(contacts));
+    if (contacts) {
+      try {
+        this.#contacts.set(JSON.parse(contacts));
+      } catch (error) {
+        console.warn('Unable to parse worklyContacts from localStorage.', error);
+        localStorage.removeItem('worklyContacts');
+      }
+    }
 
     const deals = localStorage.getItem('worklyDeals');
-    if (deals) this.#deals.set(JSON.parse(deals));
+    if (deals) {
+      try {
+        this.#deals.set(JSON.parse(deals));
+      } catch (error) {
+        console.warn('Unable to parse worklyDeals from localStorage.', error);
+        localStorage.removeItem('worklyDeals');
+      }
+    }
     
     const activities = localStorage.getItem('worklyActivities');
-    if (activities) this.#activities.set(JSON.parse(activities));
+    if (activities) {
+      try {
+        this.#activities.set(JSON.parse(activities));
+      } catch (error) {
+        console.warn('Unable to parse worklyActivities from localStorage.', error);
+        localStorage.removeItem('worklyActivities');
+      }
+    }
   }
   
   // Contacts
